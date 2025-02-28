@@ -103,7 +103,7 @@
         }
         return ResizeElement;
     }(HTMLElement));
-    var template = "\n<div class=\"handler\" title=\"{0}\"></div>\n<div class=\"toolbar\">\n  <div class=\"group\">\n    <a class=\"btn\" data-type=\"width\" data-styles=\"width:100%\">100%</a>\n    <a class=\"btn\" data-type=\"width\" data-styles=\"width:50%\">50%</a>\n    <span class=\"input-wrapper\"><input data-type=\"width\" maxlength=\"3\" /><span class=\"suffix\">%</span><span class=\"tooltip\">{5}</span></span>\n    <a class=\"btn\" data-type=\"width\" data-styles=\"width:auto\">{4}</a>\n  </div>\n  <div class=\"group\">\n    <a class=\"btn\" data-type=\"align\" data-styles=\"float:left\">{1}</a>\n    <a class=\"btn\" data-type=\"align\" data-styles=\"display:block;margin:auto;\">{2}</a>\n    <a class=\"btn\" data-type=\"align\" data-styles=\"float:right;\">{3}</a>\n    <a class=\"btn\" data-type=\"align\" data-styles=\"\">{4}</a>\n  </div>\n</div>\n";
+    var template = "\n<div class=\"handler\"></div>\n<div class=\"toolbar\">\n  <div class=\"group\">\n    <a class=\"btn\" data-type=\"width\" data-styles=\"width:100%\">100%</a>\n    <a class=\"btn\" data-type=\"width\" data-styles=\"width:50%\">50%</a>\n    <span class=\"input-wrapper\"><input data-type=\"width\" maxlength=\"3\" /><span class=\"suffix\">%</span><span class=\"tooltip\">{5}</span></span>\n    <a class=\"btn\" data-type=\"width\" data-styles=\"\">{4}</a>\n  </div>\n  <div class=\"group\">\n    <a class=\"btn\" data-type=\"align\" data-styles=\"float:left\">{1}</a>\n    <a class=\"btn\" data-type=\"align\" data-styles=\"display:block;margin:auto;\">{2}</a>\n    <a class=\"btn\" data-type=\"align\" data-styles=\"float:right;\">{3}</a>\n    <a class=\"btn\" data-type=\"align\" data-styles=\"\">{4}</a>\n  </div>\n</div>\n";
     var ResizePlugin = /** @class */ (function () {
         function ResizePlugin(resizeTarget, container, editor, options) {
             this.resizer = null;
@@ -196,7 +196,6 @@
                     left: e.clientX,
                     top: e.clientY,
                     width: this.resizeTarget.clientWidth,
-                    height: this.resizeTarget.clientHeight,
                 };
             }
         };
@@ -209,18 +208,12 @@
             if (!this.startResizePosition)
                 return;
             var deltaX = e.clientX - this.startResizePosition.left;
-            var deltaY = e.clientY - this.startResizePosition.top;
             var width = this.startResizePosition.width;
-            var height = this.startResizePosition.height;
             width += deltaX;
-            height += deltaY;
-            if (e.altKey) {
-                var originSize = this.resizeTarget.originSize;
-                var rate = originSize.height / originSize.width;
-                height = rate * width;
-            }
-            this.resizeTarget.style.setProperty("width", Math.max(width, 30) + "px");
-            this.resizeTarget.style.setProperty("height", Math.max(height, 30) + "px");
+            width = Math.max(width, 30);
+            this.resizeTarget.style.setProperty("width", width + "px");
+            var storeKey = "_styles_width";
+            this.resizeTarget[storeKey] = "width:" + width + "px;";
             this.positionResizerToTarget(this.resizeTarget);
         };
         ResizePlugin.prototype.destory = function () {

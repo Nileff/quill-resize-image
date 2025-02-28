@@ -10,7 +10,6 @@ interface Position {
   left: number;
   top: number;
   width: number;
-  height: number;
 }
 class ResizeElement extends HTMLElement {
   public originSize?: Size | null = null;
@@ -22,13 +21,13 @@ interface ResizePluginOption {
   [index: string]: any;
 }
 const template = `
-<div class="handler" title="{0}"></div>
+<div class="handler"></div>
 <div class="toolbar">
   <div class="group">
     <a class="btn" data-type="width" data-styles="width:100%">100%</a>
     <a class="btn" data-type="width" data-styles="width:50%">50%</a>
     <span class="input-wrapper"><input data-type="width" maxlength="3" /><span class="suffix">%</span><span class="tooltip">{5}</span></span>
-    <a class="btn" data-type="width" data-styles="width:auto">{4}</a>
+    <a class="btn" data-type="width" data-styles="">{4}</a>
   </div>
   <div class="group">
     <a class="btn" data-type="align" data-styles="float:left">{1}</a>
@@ -152,7 +151,6 @@ class ResizePlugin {
         left: e.clientX,
         top: e.clientY,
         width: this.resizeTarget.clientWidth,
-        height: this.resizeTarget.clientHeight,
       };
     }
   }
@@ -163,20 +161,13 @@ class ResizePlugin {
   resizing(e: MouseEvent) {
     if (!this.startResizePosition) return;
     const deltaX: number = e.clientX - this.startResizePosition.left;
-    const deltaY: number = e.clientY - this.startResizePosition.top;
     let width = this.startResizePosition.width;
-    let height = this.startResizePosition.height;
     width += deltaX;
-    height += deltaY;
+    width = Math.max(width, 30)
 
-    if (e.altKey) {
-      const originSize = this.resizeTarget.originSize as Size;
-      const rate: number = originSize.height / originSize.width;
-      height = rate * width;
-    }
-
-    this.resizeTarget.style.setProperty("width", Math.max(width, 30) + "px");
-    this.resizeTarget.style.setProperty("height", Math.max(height, 30) + "px");
+    this.resizeTarget.style.setProperty("width", width + "px");
+    const storeKey = `_styles_width`;
+    this.resizeTarget[storeKey] = `width:${width}px;`;
     this.positionResizerToTarget(this.resizeTarget);
   }
 
